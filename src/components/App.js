@@ -13,9 +13,39 @@ class App extends React.Component {
         type: 'all'
       }
     }
+
+    this.applyFilter('all')
+  }
+
+  applyFilter = (filter) => {
+    fetch(`/api/pets${filter === 'all'? '' : `?type=${filter}`}`)
+    .then(response => response.json())
+    .then(json => {
+      this.setState({pets: json})
+      console.log(this.state)
+    })
+  }
+
+  handleAdoption = (id) => {
+    console.log('handle adoption of ', id)
+    const pets = this.state.pets.map((pet) => {
+      if(pet.id == id){
+        console.log(pet.name, ' is adopted!')
+        pet.isAdopted = true
+      }
+      return pet
+    })
+    // const pets = this.state.pets.map(pet => {
+    //   return pet.id === id ? {...pet, isAdopted: true} : pet
+    // })
+    this.setState({pets})
+      
+
+
   }
 
   render() {
+    console.log('Render')
     return (
       <div className="ui container">
         <header>
@@ -24,10 +54,10 @@ class App extends React.Component {
         <div className="ui container">
           <div className="ui grid">
             <div className="four wide column">
-              <Filters />
+              <Filters onChangeType={this.applyFilter}/>
             </div>
             <div className="twelve wide column">
-              <PetBrowser />
+              <PetBrowser pets={this.state.pets} handleAdoption={this.handleAdoption}/>
             </div>
           </div>
         </div>
